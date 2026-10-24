@@ -1,69 +1,77 @@
 import Link from "next/link";
-import { mainNav } from "@/data/navigation";
-import { site } from "@/data/site";
-import Logo from "@/components/ui/Logo";
-import Reveal from "@/components/motion/Reveal";
-
-function SocialIcon({ short }: { short: string }) {
-  if (short === "ig") {
-    return (
-      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" aria-hidden="true">
-        <rect x="3" y="3" width="18" height="18" rx="5" />
-        <circle cx="12" cy="12" r="4" />
-      </svg>
-    );
-  }
-  return <span className="text-[13px] font-bold" aria-hidden="true">{short}</span>;
-}
+import { footerNav, site } from "@/data/site";
+import { accreditations } from "@/data/compliance";
+import NewsletterForm from "@/components/forms/NewsletterForm";
 
 export default function Footer() {
+  const year = new Date().getFullYear();
   return (
-    <footer className="mx-auto max-w-340 px-4 pt-14 pb-7 sm:px-8">
-      <Reveal className="flex flex-wrap items-center justify-between gap-8 lg:px-10">
-        <Logo />
-        <nav aria-label="Footer" className="flex flex-wrap gap-7 text-sm">
-          {mainNav.map((item) => (
-            <Link key={item.href} href={item.href} className="nav-link">
-              {item.label}
-            </Link>
-          ))}
-        </nav>
-        <div className="text-sm leading-[1.9] text-ink-soft">
-          <div><a href={site.phoneHref} className="link-line">{site.phone}</a></div>
-          <div><a href={`mailto:${site.email}`} className="link-line">{site.email}</a></div>
-          <div>{site.location}</div>
-        </div>
-        <div className="flex gap-2.5">
-          {site.socials.map((s) => (
-            <a
-              key={s.label}
-              href={s.href}
-              aria-label={s.label}
-              className="btn-round grid size-10.5 place-items-center rounded-full border border-line-dark"
-            >
-              <SocialIcon short={s.short} />
-            </a>
-          ))}
-        </div>
-      </Reveal>
+    <footer className="bg-ink text-[#c9ced4]">
+      <div className="wrap flex flex-col gap-12 pt-16 pb-28 lg:pb-10">
+        <div className="flex flex-wrap justify-between gap-x-16 gap-y-10">
+          <div className="flex min-w-60 flex-1 flex-col gap-4">
+            <span className="display text-[34px] font-black text-white" style={{ fontStretch: "120%" }}>
+              CDC
+            </span>
+            <address className="text-[15px] leading-7 not-italic">
+              {site.address.street}, {site.address.town}, {site.address.postcode}
+              <br />
+              {site.hours}
+            </address>
+            <p className="flex flex-col gap-1 text-[15px]">
+              <a href={site.phoneHref} className="text-white hover:underline">
+                {site.phone}
+              </a>
+              <a href={`mailto:${site.email}`} className="text-white hover:underline">
+                {site.email}
+              </a>
+            </p>
+          </div>
 
-      <Reveal className="mt-10 flex flex-wrap gap-2.5 lg:px-10" delay={0.1}>
-        {site.accreditations.map((a) => (
-          <span key={a} className="border border-line-dark px-3.5 py-2 text-[11px] tracking-widest text-stone uppercase">
-            {a}
+          {(
+            [
+              ["Company", footerNav.company],
+              ["Tools", footerNav.tools],
+              ["Policies", footerNav.policies],
+            ] as const
+          ).map(([title, links]) => (
+            <nav key={title} aria-label={title} className="flex flex-col gap-2.5 text-[15px]">
+              <span className="font-mono text-xs tracking-[0.12em] text-[#8d96a0] uppercase">{title}</span>
+              {links.map((l) => (
+                <Link key={l.href} href={l.href} className="hover:text-white">
+                  {l.label}
+                </Link>
+              ))}
+            </nav>
+          ))}
+
+          <div className="flex min-w-65 flex-1 flex-col gap-3">
+            <span className="font-mono text-xs tracking-[0.12em] text-[#8d96a0] uppercase">Project news</span>
+            <p className="text-[15px] leading-6">New case studies and handovers, about once a month.</p>
+            <NewsletterForm />
+          </div>
+        </div>
+
+        <ul className="flex flex-wrap gap-2.5" aria-label="Accreditations">
+          {accreditations.map((a) => (
+            <li key={a} className="border border-[#2c3238] px-3 py-2 font-mono text-[11px] tracking-widest uppercase">
+              {a}
+            </li>
+          ))}
+        </ul>
+
+        <div className="flex flex-wrap justify-between gap-4 border-t border-[#2c3238] pt-6 text-[13px] text-[#8d96a0]">
+          <span>
+            © {year} {site.name}. Registered in England and Wales.
           </span>
-        ))}
-      </Reveal>
-
-      <div className="mt-7 flex flex-wrap justify-between gap-3 border-t border-line-dark pt-5.5 text-xs text-muted lg:px-10">
-        <span>© {new Date().getFullYear()} {site.name}</span>
-        <span className="flex flex-wrap gap-5.5">
-          {site.legal.map((l) => (
-            <Link key={l.href} href={l.href} className="link-line">
-              {l.label}
-            </Link>
-          ))}
-        </span>
+          <span className="flex flex-wrap gap-5">
+            {site.socials.map((s) => (
+              <a key={s.label} href={s.href} target="_blank" rel="noopener noreferrer" className="hover:text-white">
+                {s.label}
+              </a>
+            ))}
+          </span>
+        </div>
       </div>
     </footer>
   );

@@ -1,9 +1,7 @@
 @import "tailwindcss";
 
-/* ------------------------------------------------------------------
-   Design tokens  —  luxury architectural magazine style
-------------------------------------------------------------------- */
 @theme {
+  /* Your original colours */
   --color-cream: #f3efe8;
   --color-cream-dark: #efeae1;
   --color-paper: #fbf9f5;
@@ -18,14 +16,31 @@
   --color-gold-dark: #9a7b45;
   --color-gold-deep: #8c7550;
 
+  --color-ground: #f3efe8; 
+  --color-mist: #efeae1;
+  --color-steel: #6b655b; 
+  --color-navy: #1b1a17;
+  --color-navy-deep: #121110;
+  --color-navy-line: #4a463f; 
+  --color-navy-soft: #cfc8bb; 
+  --color-navy-text: #d8d0c2; 
+  --color-red: #8c7550; 
+  --color-red-dark: #6f5c3e;
+  --color-red-light: #c9a86a; 
+  --color-success: #2f6b45;
+
+  /* Your original fonts: Manrope + Cormorant Garamond */
   --font-sans: var(--font-manrope), system-ui, sans-serif;
   --font-serif: var(--font-cormorant), Georgia, serif;
+  --font-display: var(--font-cormorant), Georgia, serif;
+  --font-mono: var(--font-manrope), system-ui, sans-serif;
 
   --ease-lux: cubic-bezier(0.22, 0.8, 0.2, 1);
 }
 
 html {
   background: var(--color-cream);
+  scroll-behavior: smooth;
 }
 body {
   background: var(--color-cream);
@@ -34,37 +49,65 @@ body {
   -webkit-font-smoothing: antialiased;
 }
 
-/* Lenis smooth scroll */
-html.lenis,
-html.lenis body {
-  height: auto;
-}
-.lenis.lenis-smooth {
-  scroll-behavior: auto !important;
-}
-.lenis.lenis-stopped {
-  overflow: hidden;
+h1,
+h2,
+h3 {
+  text-wrap: balance;
 }
 
-/* ------------------------------------------------------------------
-   Button effects (CSS keeps hover effects cheap and smooth)
-------------------------------------------------------------------- */
+:focus-visible {
+  outline: 2px solid var(--color-gold-deep);
+  outline-offset: 3px;
+}
+
 @layer components {
+ 
+  .wrap {
+    width: 100%;
+    max-width: 1360px;
+    margin-inline: auto;
+    padding-left: max(24px, env(safe-area-inset-left, 0px));
+    padding-right: max(24px, env(safe-area-inset-right, 0px));
+  }
+
+  .display {
+    font-family: var(--font-serif);
+    font-weight: 500;
+    font-stretch: normal !important;
+    letter-spacing: -0.01em;
+    line-height: 1.02;
+  }
+
+  .label {
+    font-family: var(--font-sans);
+    font-size: 12px;
+    font-weight: 600;
+    letter-spacing: 0.24em;
+    text-transform: uppercase;
+    color: var(--color-stone);
+  }
+
   .btn {
     position: relative;
+    isolation: isolate;
+    overflow: hidden;
     display: inline-flex;
     align-items: center;
-    gap: 14px;
-    overflow: hidden;
-    isolation: isolate;
+    justify-content: center;
+    gap: 12px;
+    min-height: 48px;
+    padding: 14px 26px;
+    font-weight: 600;
+    font-size: 14px;
+    border-radius: 3px;
+    text-decoration: none;
     cursor: pointer;
+    transition:
+      color 0.45s ease,
+      border-color 0.45s ease,
+      background-color 0.45s ease;
   }
-
-  /* 1. gold fill slide + 5. click ripple */
-  .btn-fill {
-    transition: color 0.4s ease;
-  }
-  .btn-fill::before {
+  .btn::before {
     content: "";
     position: absolute;
     inset: 0;
@@ -72,246 +115,213 @@ html.lenis body {
     background: var(--color-gold);
     transform: scaleX(0);
     transform-origin: right;
-    transition: transform 0.55s var(--ease-lux);
+    transition: transform 0.6s var(--ease-lux);
   }
-  .btn-fill:hover {
-    color: var(--color-ink);
-  }
-  .btn-fill:hover::before {
+  .btn:hover::before {
     transform: scaleX(1);
     transform-origin: left;
   }
-  .btn-fill::after {
-    content: "";
-    position: absolute;
-    left: 50%;
-    top: 50%;
-    z-index: -1;
-    width: 12px;
-    height: 12px;
-    margin: -6px 0 0 -6px;
-    border-radius: 9999px;
-    background: rgb(255 255 255 / 0.55);
-    opacity: 0;
-    transform: scale(0);
-  }
-  .btn-fill:active::after {
-    animation: btn-ripple 0.6s ease-out;
-  }
-
-  /* 6. border draw */
-  .btn-draw::before,
-  .btn-draw::after {
-    content: "";
-    position: absolute;
-    width: 0;
-    height: 0;
-    border: 1px solid transparent;
-    border-radius: inherit;
-    pointer-events: none;
-  }
-  .btn-draw::before {
-    top: 0;
-    left: 0;
-  }
-  .btn-draw::after {
-    right: 0;
-    bottom: 0;
-  }
-  .btn-draw:hover::before {
-    width: 100%;
-    height: 100%;
-    border-top-color: currentColor;
-    border-right-color: currentColor;
-    transition: width 0.25s ease, height 0.25s ease 0.25s;
-  }
-  .btn-draw:hover::after {
-    width: 100%;
-    height: 100%;
-    border-bottom-color: currentColor;
-    border-left-color: currentColor;
-    transition: width 0.25s ease 0.5s, height 0.25s ease 0.75s;
-  }
-
-  /* 7. shine sweep */
-  .btn-shine::after {
+  .btn::after {
     content: "";
     position: absolute;
     top: 0;
     left: -80%;
-    z-index: 1;
     width: 50%;
     height: 100%;
-    background: linear-gradient(100deg, transparent, rgb(255 255 255 / 0.65), transparent);
+    background: linear-gradient(100deg, transparent, rgb(255 255 255 / 0.45), transparent);
     transform: skewX(-20deg);
+    pointer-events: none;
   }
-  .btn-shine:hover::after {
+  .btn:hover::after {
     animation: btn-shine 0.9s ease;
   }
 
-  /* 2. arrow swap */
-  .arrow-swap {
-    position: relative;
-    display: inline-block;
-    width: 1em;
-    height: 1em;
-    overflow: hidden;
-    line-height: 1;
+  .btn-red,
+  .btn-navy {
+    background: var(--color-ink);
+    color: var(--color-cream);
   }
-  .arrow-swap > span {
-    position: absolute;
-    inset: 0;
-    transition: transform 0.45s var(--ease-lux);
-  }
-  .arrow-swap > span + span {
-    transform: translateX(-140%);
-  }
-  .group:hover .arrow-swap > span:first-child {
-    transform: translateX(140%);
-  }
-  .group:hover .arrow-swap > span + span {
-    transform: translateX(0);
-  }
-
-  /* 3. text roll */
-  .text-roll {
-    display: inline-block;
-    height: 1.25em;
-    overflow: hidden;
-    line-height: 1.25;
-  }
-  .text-roll > span {
-    display: flex;
-    flex-direction: column;
-    transition: transform 0.5s var(--ease-lux);
-  }
-  .group:hover .text-roll > span {
-    transform: translateY(-50%);
-  }
-
-  /* 8. round fill from centre */
-  .btn-round {
-    position: relative;
-    overflow: hidden;
-    isolation: isolate;
-    transition: color 0.35s ease, border-color 0.35s ease;
-  }
-  .btn-round::before {
-    content: "";
-    position: absolute;
-    inset: 0;
-    z-index: -1;
-    border-radius: 9999px;
-    background: var(--color-gold);
-    transform: scale(0);
-    transition: transform 0.45s var(--ease-lux);
-  }
-  .btn-round:hover {
+  .btn-red:hover,
+  .btn-navy:hover {
     color: var(--color-ink);
+  }
+  .btn-outline {
+    border: 1px solid var(--color-gold-deep);
+    color: var(--color-ink);
+    background: transparent;
+  }
+  .btn-outline:hover {
     border-color: var(--color-gold);
+    color: var(--color-ink);
   }
-  .btn-round:hover::before {
-    transform: scale(1);
+  .btn-white {
+    background: var(--color-gold);
+    color: var(--color-ink);
+  }
+  .btn-white::before {
+    background: var(--color-cream);
+  }
+  .btn[disabled] {
+    opacity: 0.6;
+    cursor: wait;
+  }
+  .btn[disabled]::before,
+  .btn[disabled]::after {
+    display: none;
   }
 
-  /* 11. underline grow */
-  .link-line {
-    background-image: linear-gradient(var(--color-gold), var(--color-gold));
-    background-size: 0 1px;
-    background-repeat: no-repeat;
-    background-position: 0 100%;
-    padding-bottom: 4px;
-    transition: background-size 0.45s var(--ease-lux), color 0.3s ease;
+  .arrow {
+    display: inline-block;
+    transition: transform 0.35s var(--ease-lux);
   }
-  .link-line:hover {
-    background-size: 100% 1px;
+  a:hover .arrow,
+  button:hover .arrow {
+    transform: translateX(5px);
   }
 
-  /* nav underline (grows left → right, leaves right) */
-  .nav-link {
-    position: relative;
-    transition: color 0.3s ease;
-  }
-  .nav-link::after {
-    content: "";
-    position: absolute;
-    left: 0;
-    right: 0;
-    bottom: -6px;
+  .gold-rule {
+    display: block;
+    width: 72px;
     height: 1px;
     background: var(--color-gold);
-    transform: scaleX(0);
-    transform-origin: right;
-    transition: transform 0.45s var(--ease-lux);
-  }
-  .nav-link:hover {
-    color: var(--color-gold-dark);
-  }
-  .nav-link:hover::after {
-    transform: scaleX(1);
     transform-origin: left;
+    animation: rule-draw 1.1s var(--ease-lux) 0.45s both;
   }
 
-  /* 10. WhatsApp pulse */
-  .pulse-ring::before,
-  .pulse-ring::after {
-    content: "";
-    position: absolute;
-    inset: -1px;
-    border: 1.5px solid var(--color-gold);
-    border-radius: 9999px;
-    pointer-events: none;
-    animation: pulse-ring 2.6s ease-out infinite;
-  }
-  .pulse-ring::after {
-    animation-delay: 1.3s;
+  .board-row {
+    animation: row-in 0.7s var(--ease-lux) both;
   }
 
-  /* reviews marquee */
-  .marquee {
-    display: flex;
-    gap: 22px;
-    width: max-content;
-    animation: marquee 40s linear infinite;
+  .lift {
+    transition:
+      transform 0.5s var(--ease-lux),
+      box-shadow 0.5s ease,
+      border-color 0.3s ease;
   }
-  .marquee:hover {
-    animation-play-state: paused;
+  .lift:hover {
+    transform: translateY(-6px);
+    box-shadow: 0 18px 40px rgb(27 26 23 / 0.08);
   }
 
-  /* bottom banner slow zoom */
-  .ken-burns {
-    animation: ken-burns 22s ease-in-out infinite alternate;
+  /* Selected map pin pulses in gold */
+  .pin-pulse {
+    box-shadow: 0 0 0 0 rgb(201 168 106 / 0.6);
+    animation: pin-pulse 2.2s ease-out infinite;
+  }
+
+  .ph {
+    background-color: var(--color-sand);
+    background-image: repeating-linear-gradient(135deg, rgb(27 26 23 / 0.06) 0 2px, transparent 2px 14px);
+  }
+  .ph-dark {
+    background-color: #2a2824;
+    background-image: repeating-linear-gradient(135deg, rgb(201 168 106 / 0.1) 0 2px, transparent 2px 14px);
+  }
+  .ph-after {
+    background-color: #d9c9a6;
+    background-image: repeating-linear-gradient(45deg, rgb(140 117 80 / 0.15) 0 2px, transparent 2px 14px);
+  }
+
+  .map-ground {
+    background-color: var(--color-ink);
+    background-image: radial-gradient(rgb(201 168 106 / 0.22) 1px, transparent 1px);
+    background-size: 18px 18px;
+  }
+
+  .field {
+    width: 100%;
+    min-height: 48px;
+    border: 1px solid var(--color-line-dark);
+    border-radius: 3px;
+    background: var(--color-paper);
+    padding: 12px 14px;
+    font: inherit;
+    color: var(--color-ink);
+    transition:
+      border-color 0.3s ease,
+      box-shadow 0.3s ease;
+  }
+  .field:focus {
+    border-color: var(--color-gold-deep);
+    outline: none;
+    box-shadow: 0 0 0 3px rgb(201 168 106 / 0.25);
+  }
+  .field[aria-invalid="true"] {
+    border-color: #a3191f;
+  }
+  .field-dark {
+    border-color: var(--color-stone);
+    background: #121110;
+    color: var(--color-cream);
+  }
+
+  .prose-cdc h2 {
+    font-family: var(--font-serif);
+    font-weight: 500;
+    font-size: 30px;
+    margin: 40px 0 12px;
+  }
+  .prose-cdc p,
+  .prose-cdc li {
+    font-size: 17px;
+    line-height: 1.7;
+    color: var(--color-ink-soft);
+    max-width: 68ch;
+  }
+  .prose-cdc ul {
+    list-style: disc;
+    padding-left: 22px;
+    margin: 12px 0;
+  }
+  .prose-cdc p + p {
+    margin-top: 14px;
   }
 }
 
-@keyframes btn-ripple {
-  from { transform: scale(0); opacity: 1; }
-  to { transform: scale(30); opacity: 0; }
-}
 @keyframes btn-shine {
-  to { left: 140%; }
+  to {
+    left: 140%;
+  }
 }
-@keyframes pulse-ring {
-  from { transform: scale(1); opacity: 0.8; }
-  to { transform: scale(1.8); opacity: 0; }
+@keyframes rule-draw {
+  from {
+    transform: scaleX(0);
+  }
+  to {
+    transform: scaleX(1);
+  }
 }
-@keyframes marquee {
-  to { transform: translateX(calc(-50% - 11px)); }
+@keyframes row-in {
+  from {
+    opacity: 0;
+    transform: translateX(16px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
 }
-@keyframes ken-burns {
-  from { transform: scale(1); }
-  to { transform: scale(1.14) translate(-2%, -2%); }
+@keyframes pin-pulse {
+  0% {
+    box-shadow: 0 0 0 0 rgb(201 168 106 / 0.6);
+  }
+  70% {
+    box-shadow: 0 0 0 14px rgb(201 168 106 / 0);
+  }
+  100% {
+    box-shadow: 0 0 0 0 rgb(201 168 106 / 0);
+  }
 }
 
 @media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
   *,
   *::before,
   *::after {
     animation-duration: 0.001ms !important;
     animation-iteration-count: 1 !important;
     transition-duration: 0.001ms !important;
-  }
-  .marquee {
-    animation: none;
   }
 }

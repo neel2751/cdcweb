@@ -1,93 +1,119 @@
 "use client";
 
-import { useEffect, useState } from "react";
 import Link from "next/link";
-import { motion, useMotionValueEvent, useScroll } from "motion/react";
-import { mainNav } from "@/data/navigation";
-import { cn, EASE } from "@/lib/utils";
-import Logo from "@/components/ui/Logo";
-import Button from "@/components/ui/Button";
-import MenuOverlay from "./MenuOverlay";
-import { setScrollLocked } from "@/components/motion/SmoothScroll";
+import { usePathname } from "next/navigation";
+import { useEffect, useState } from "react";
+import { mainNav, site } from "@/data/site";
+import { accreditations } from "@/data/compliance";
+import { cn } from "@/lib/utils";
+import Logo from "./Logo";
 
 export default function SiteHeader() {
-  const { scrollY } = useScroll();
-  const [hidden, setHidden] = useState(false);
-  const [scrolled, setScrolled] = useState(false);
-  const [menuOpen, setMenuOpen] = useState(false);
-
-  useMotionValueEvent(scrollY, "change", (y) => {
-    const prev = scrollY.getPrevious() ?? 0;
-    setHidden(y > 160 && y > prev && !menuOpen);
-    setScrolled(y > 30);
-  });
+  const pathname = usePathname();
+  const [open, setOpen] = useState(false);
 
   useEffect(() => {
-    setScrollLocked(menuOpen);
-    const onKey = (e: KeyboardEvent) => e.key === "Escape" && setMenuOpen(false);
-    if (menuOpen) window.addEventListener("keydown", onKey);
-    return () => window.removeEventListener("keydown", onKey);
-  }, [menuOpen]);
+    if (!open) return;
+    const onKey = (e: KeyboardEvent) => e.key === "Escape" && setOpen(false);
+    window.addEventListener("keydown", onKey);
+    document.documentElement.style.overflow = "hidden";
+    return () => {
+      window.removeEventListener("keydown", onKey);
+      document.documentElement.style.overflow = "";
+    };
+  }, [open]);
+
+  const isActive = (href: string) => pathname === href || pathname.startsWith(href + "/");
 
   return (
     <>
-      <motion.header
-        className={cn(
-          "sticky top-0 z-50 border-b transition-[background-color,box-shadow,border-color] duration-500",
-          menuOpen
-            ? "border-transparent bg-transparent"
-            : scrolled
-              ? "border-line bg-cream/80 shadow-[0_10px_30px_rgba(27,26,23,0.06)] backdrop-blur-md"
-              : "border-line bg-cream",
-        )}
-        animate={{ y: hidden ? "-100%" : "0%" }}
-        transition={{ duration: 0.5, ease: EASE }}
-      >
-        <div className="mx-auto flex max-w-340 items-center justify-between gap-6 px-4 py-4.5 sm:px-8">
-          <Logo light={menuOpen} className="relative z-60" />
+      <a href="#main" className="sr-only focus:not-sr-only focus:fixed focus:top-3 focus:left-3 focus:z-100 focus:bg-navy focus:px-4 focus:py-2 focus:text-white">
+        Skip to content
+      </a>
 
-          <nav aria-label="Main" className="hidden items-center gap-10 text-sm font-medium lg:flex">
+      {/* utility bar */}
+      <div className="bg-navy text-white">
+        <div className="wrap flex flex-wrap items-center justify-between gap-x-7 gap-y-1 py-2.5 font-mono text-xs tracking-wide">
+          <span className="hidden text-navy-soft sm:inline">{accreditations.join(" · ")}</span>
+          <span className="flex flex-wrap gap-6">
+            <a href={site.phoneHref} className="hover:underline">
+              {site.phone}
+            </a>
+            <Link href="/careers" className="hover:underline">
+              Careers — submit your CV <span aria-hidden="true">→</span>
+            </Link>
+          </span>
+        </div>
+      </div>
+
+      <header className="sticky top-0 z-50 border-b border-line bg-paper/95 backdrop-blur" style={{ top: "env(safe-area-inset-top, 0px)" }}>
+        <div className="wrap flex items-center justify-between gap-6 py-4">
+          <Logo />
+
+          <nav aria-label="Main" className="hidden items-center gap-7 text-[15px] font-medium lg:flex">
             {mainNav.map((item) => (
-              <Link key={item.href} href={item.href} className="nav-link">
+              <Link
+                key={item.href}
+                href={item.href}
+                aria-current={isActive(item.href) ? "page" : undefined}
+                className={cn("border-b-2 py-1 transition-colors hover:text-red", isActive(item.href) ? "border-red" : "border-transparent")}
+              >
                 {item.label}
               </Link>
             ))}
           </nav>
 
-          <div className="relative z-60 flex items-center gap-4">
-            <Button href="/#contact" magnetic className="hidden px-5.5! py-3.25! text-[13px] sm:inline-flex">
-              Get a Quote
-            </Button>
+          <div className="flex items-center gap-3">
+            <Link href="/estimator" className="btn btn-red hidden sm:inline-flex">
+              Estimate your project <span className="arrow" aria-hidden="true">→</span>
+            </Link>
             <button
               type="button"
-              onClick={() => setMenuOpen((o) => !o)}
-              aria-label={menuOpen ? "Close menu" : "Open menu"}
-              aria-expanded={menuOpen}
-              aria-controls="site-menu"
-              className="flex size-11 cursor-pointer flex-col items-center justify-center gap-1.5"
+              className="flex size-12 flex-col items-center justify-center gap-1.5 lg:hidden"
+              aria-label={open ? "Close menu" : "Open menu"}
+              aria-expanded={open}
+              aria-controls="mobile-menu"
+              onClick={() => setOpen((o) => !o)}
             >
-              {[0, 1, 2].map((i) => (
-                <motion.span
-                  key={i}
-                  className={cn("block h-[1.5px] w-6 transition-colors duration-300", menuOpen ? "bg-cream" : "bg-ink")}
-                  animate={
-                    menuOpen
-                      ? i === 0
-                        ? { y: 7.5, rotate: 45 }
-                        : i === 1
-                          ? { opacity: 0 }
-                          : { y: -7.5, rotate: -45 }
-                      : { y: 0, rotate: 0, opacity: 1 }
-                  }
-                  transition={{ duration: 0.4, ease: EASE }}
-                />
-              ))}
+              <span className={cn("block h-0.5 w-6 bg-ink transition-transform", open && "translate-y-2 rotate-45")} />
+              <span className={cn("block h-0.5 w-6 bg-ink transition-opacity", open && "opacity-0")} />
+              <span className={cn("block h-0.5 w-6 bg-ink transition-transform", open && "-translate-y-2 -rotate-45")} />
             </button>
           </div>
         </div>
-      </motion.header>
 
-      <MenuOverlay open={menuOpen} onClose={() => setMenuOpen(false)} />
+        {open && (
+          <div id="mobile-menu" className="absolute inset-x-0 top-full h-[calc(100dvh-80px)] overflow-y-auto border-t border-line bg-paper lg:hidden">
+            {/* Any link tap closes the menu. */}
+            <nav aria-label="Mobile" className="wrap flex flex-col py-4" onClick={(e) => (e.target as HTMLElement).closest("a") && setOpen(false)}>
+              {mainNav.map((item) => (
+                <Link
+                  key={item.href}
+                  href={item.href}
+                  aria-current={isActive(item.href) ? "page" : undefined}
+                  className="display flex min-h-14 items-center justify-between border-b border-line text-2xl"
+                >
+                  {item.label}
+                  <span className="text-red" aria-hidden="true">
+                    →
+                  </span>
+                </Link>
+              ))}
+              <div className="mt-6 flex flex-col gap-3">
+                <Link href="/request-a-quote" className="btn btn-red">
+                  Request a quote
+                </Link>
+                <Link href="/estimator" className="btn btn-outline">
+                  Estimate your project
+                </Link>
+              </div>
+              <p className="mt-6 font-mono text-sm text-steel">
+                {site.phone} · {site.email}
+              </p>
+            </nav>
+          </div>
+        )}
+      </header>
     </>
   );
 }
